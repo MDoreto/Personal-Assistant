@@ -1,17 +1,5 @@
 version: '3.5'
 services:
-  database:
-    container_name: postgres
-    image: postgres:latest
-    restart: always
-    networks:
-      - flask_network
-    env_file: database.conf
-    ports:
-      - 7000:5432  
-    volumes:
-      - db_volume:/var/lib/postgresql
-
   backend:
     build: backend
     container_name: api

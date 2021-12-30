@@ -19,6 +19,7 @@ def detect_intent_texts(project_id, session_id, text):
 @app.route('/dialogflow', methods=['POST'])
 def send_message():
     message = request.json['text']
+    print(message)
     project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
     res = detect_intent_texts(project_id, "unique", message)
     return res.fulfillment_text

@@ -10,11 +10,11 @@
         </v-btn>
       </v-toolbar>
     </div>
-    <div>
+    <div class="divchat">
       <v-row
         v-for="message in messages"
-        :key="message"
-        class="pa-2 ma-2 d-flex"
+        :key="message.id"
+        class="pa-2 ma-2 d-flex "
         :class="message.sender == 'User' ? 'flex-row-reverse' : 'flex-row'"
         width="100"
         ><v-card
@@ -23,7 +23,7 @@
           :class="
             message.sender == 'User' ? 'teal lighten-3' : 'blue lighten-3'
           "
-          class=""
+          :id="message.id"
         >
           <v-card-text
             ><span class="font-weight-bold">{{ message.sender }}</span
@@ -56,6 +56,12 @@
   </v-card>
 </template>
 <style scoped>
+.divchat {
+  max-height: 450px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column-reverse;
+}
 </style>
 <script>
 import axios from "axios";
@@ -72,14 +78,20 @@ export default {
       this.$emit("update:dialog", false);
     },
     sendMessage() {
-      this.messages.push({ text: this.text, sender: "User" });
+      this.messages.unshift({
+        text: this.text,
+        sender: "User",
+        id: this.messages.length,
+      });
+
       var temp = this.text;
       this.text = "";
+      var message = { text: "...", sender: "Jarvis", id: this.messages.length };
+      this.messages.unshift(message);
       axios
-        .post("http://127.0.0.1:5000/dialogflow", { text: temp })
+        .post(process.env.VUE_APP_ROOT_API, { text: temp })
         .then((response) => {
-          this.messages.push({ text: response.data, sender: "Jarvis" });
-          console.log(this.messages);
+          message.text = response.data;
         });
     },
   },
