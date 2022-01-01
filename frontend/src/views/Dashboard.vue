@@ -29,6 +29,12 @@
         ><AltitudeCard :value.sync="nodeMcu.altitude" /></v-col
       ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
         ><PressureCard :value.sync="lastMeasure.pressure" /></v-col
+      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+        ><SwitchCard :value="true" icon="mdi-television" color="red lighten-2"/></v-col
+      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+        ><SwitchCard :value="true" icon="mdi-desktop-classic" color="brown lighten-3"/></v-col
+      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+        ><SwitchCard :value="true" icon="mdi-lightbulb-on-outline" color="yellow lighten-3"/></v-col
     ></v-row>
 
     <v-btn
@@ -48,6 +54,7 @@
       content-class="chat-dialog"
       hide-overlay
       width="350"
+      transition="dialog-bottom-transition"
     >
       <Chat
     /></v-dialog>
@@ -78,6 +85,7 @@ export default {
     AltitudeCard: () => import("@/components/AltitudeCard.vue"),
     PressureCard: () => import("@/components/PressureCard.vue"),
     Chat: () => import("@/components/Chat.vue"),
+    SwitchCard: () => import("@/components/SwitchCard.vue"),
   },
   firebase: {
     nodeMcu: db.ref("NodeMcu"),

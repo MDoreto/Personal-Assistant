@@ -1,9 +1,8 @@
 /temp/
-/backend/venv/
-/backend/*.env
+venv/
+*.env
 **/__pycache__/
 **/node_modules
 **/dist
 *.egg-info/
 **.xlsx
-!backend/application/data_example.xlsx

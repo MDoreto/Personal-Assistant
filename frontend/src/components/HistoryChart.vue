@@ -54,12 +54,20 @@ export default {
           boundaryGap: [0, "100%"],
           min: 0,
           max: 50,
+          axisLabel: {
+           formatter: '{value} °C'
+          },
         },
         {
           type: "value",
           boundaryGap: [0, "100%"],
           min: 0,
           max: 100,
+          axisLabel: {
+           formatter: '{value} %',
+           align: 'right',
+           margin: 50
+          },
         },
       ],
       dataZoom: [
