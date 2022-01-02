@@ -1,22 +1,57 @@
 from datetime import datetime
 import requests
+from bs4 import BeautifulSoup
+import logging
+import html5lib
+
+from requests.models import requote_uri
+requests.packages.urllib3.disable_warnings()
 
 
 class Services:
-    def consult_weather(parameters):
+
+    def google_search(query):
+        header = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
+            'referer': 'https://www.google.com/'
+
+        }
+        url = 'https://www.google.com/search?q=' + query['queryText']
+        logging.info(url)
+        req = requests.get(url,verify=False)
+        print(req)
+        #print(req.text.split('Contudo a maioria dos')[0])
+        soup = BeautifulSoup(req.text, 'html5lib')
+        print(type(soup))
+        print(soup)
+        a = soup.select_one('.Z0LcW')
+        logging.info(a)
+        if a:
+            logging.info('.Z0LcW')
+            return a.text
+        a = soup.select_one('.ILfuVd')
+        logging.info(a)
+        if a:
+            logging.info('.ILfuVd')
+            return a.text
+        return 'Não encontrei nada.'
+
+    def consult_weather(query):
+        parameters = query['parameters']
         if parameters['location']:
             city = parameters['location']['city']
         else:
             city = 'Diadema'
         api_key = 'ad1fe135975dfc854a7d44ad5eb67c2c'
-        coord = {'Diadema': {'lat': -23.6861, 'lon': -46.6228}, 'Santo André': {"lon": -46.5383, "lat": -23.6639}}
+        coord = {'Diadema': {'lat': -23.6861, 'lon': -46.6228},
+                 'Santo André': {"lon": -46.5383, "lat": -23.6639}}
         if city in coord:
             lat = coord[city]['lat']
             lon = coord[city]['lon']
         else:
             response = requests.get(
                 'https://api.openweathermap.org/data/2.5/weather', params={'appid': api_key, 'q': city}).json()
-            if response['cod']== '404':
+            if response['cod'] == '404':
                 return 'Não consegui encontrar este local'
             lat = response['coord']['lat']
             lon = response['coord']['lon']
@@ -54,3 +89,5 @@ def get_weather_response(parameters, i):
     if isinstance(temp, dict):
         return 'máxima de ' + str(temp['max']) + ' graus e mínima de ' + str(temp['min']) + ' graus, ' + i['weather'][0]['description']
     return str(temp) + ' graus, ' + i['weather'][0]['description']
+
+#print(Services.google_search("qual a religiao predominante na russia"))

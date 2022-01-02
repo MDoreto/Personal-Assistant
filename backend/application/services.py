@@ -1,56 +1,61 @@
-from datetime import datetime
-import requests
+from pywebostv.discovery import *
+from pywebostv.connection import *
+from pywebostv.controls import *
+import pickle
 
 
-class Services:
-    def consult_weather(parameters):
-        if parameters['location']:
-            city = parameters['location']['city']
-        else:
-            city = 'Diadema'
-        api_key = 'ad1fe135975dfc854a7d44ad5eb67c2c'
-        coord = {'Diadema': {'lat': -23.6861, 'lon': -46.6228}, 'Santo André': {"lon": -46.5383, "lat": -23.6639}}
-        if city in coord:
-            lat = coord[city]['lat']
-            lon = coord[city]['lon']
-        else:
-            response = requests.get(
-                'https://api.openweathermap.org/data/2.5/weather', params={'appid': api_key, 'q': city}).json()
-            if response['cod']== '404':
-                return 'Não consegui encontrar este local'
-            lat = response['coord']['lat']
-            lon = response['coord']['lon']
-        query = {'lat': lat, 'lon': lon, 'units': 'metric',
-                 'lang': 'pt_br', 'appid': api_key, 'exclude': 'minutely'}
-        api_addres = 'https://api.openweathermap.org/data/2.5/onecall'
-        response = requests.get(api_addres, params=query).json()
-        if parameters['date-time']:
-            if 'date_time' in parameters['date-time']:
-                date = datetime.strptime(
-                    parameters['date-time']['date_time'].split(':')[0], "%Y-%m-%dT%H")
-                for data in response['hourly']:
-                    if datetime.fromtimestamp(data['dt']) == date:
-                        return get_weather_response(parameters, data)
-            else:
-                date = datetime.strptime(
-                    parameters['date-time'].split('T')[0], "%Y-%m-%d")
-                for data in response['daily']:
-                    if datetime.fromtimestamp(data['dt']).date() == date.date():
-                        return get_weather_response(parameters, data)
-        else:
-            data = response['current']
-            return get_weather_response(parameters, data)
-        return "Informação não encontrada"
+class Tv:
 
+    def __init__(self, ip, location):
+        self.ip = ip
+        self.location = location
 
-def get_weather_response(parameters, i):
-    if parameters['weather_type'] == 'pressure':
-        return str(i['pressure'] / 1000) + ' bar'
-    if parameters['weather_type'] == 'humidity':
-        return str(i['humidity']) + '%'
-    if parameters['weather_type'] == 'rain':
-        return 'A probabilidade de chuva é de ' + str(i['pop']*100) + '%'
-    temp = i['temp']
-    if isinstance(temp, dict):
-        return 'máxima de ' + str(temp['max']) + ' graus e mínima de ' + str(temp['min']) + ' graus, ' + i['weather'][0]['description']
-    return str(temp) + ' graus, ' + i['weather'][0]['description']
+    @property
+    def system(self):
+        return SystemControl(self.client)
+
+    @property
+    def media(self):
+        return MediaControl(self.client)
+
+    @property
+    def app(self):
+        return ApplicationControl(self.client)
+
+    @property
+    def inp(self):
+        return InputControl(self.client)
+
+    @property
+    def source(self):
+        return SourceControl(self.client)
+
+    @property
+    def control(self):
+        return TvControl(self.client)
+
+    @property
+    def client(self):
+        client = WebOSClient(self.ip)
+        client.connect()
+        store = {'client_key': 'a32d4a9287aa406c1f7a1b53c80cea3f'}
+        for status in client.register(store):
+            if status == WebOSClient.PROMPTED:
+                print("Please accept the connect on the TV!")
+            elif status == WebOSClient.REGISTERED:
+                print("Registration successful!")
+        return client
+
+    def turn_off(self):
+        self.system.power_off()
+
+    def connect_to(self, device):
+        device_name = device.__qualname__.split('.')[0]
+        if device_name == 'Desktop':
+            sources = self.source.list_sources()
+            self.source.set_source(
+                next((x for x in sources if x.label == 'PC'), None))
+        if device_name == 'SoundBox':
+            outputs = self.media.list_audio_output_sources()
+            self.media.set_audio_output(
+                next((x for x in outputs if x.data == 'bt_soundbar'), None))
