@@ -141,23 +141,24 @@ export default {
         })
 
         .then((response) => {
-          this.messages[0].data = response.data.queryResult;
+          this.messages[0].data = response.data;
           this.messages.unshift({
             data: {
-              fulfillmentText: response.data.queryResult.fulfillmentText,
+              fulfillmentText: response.data.fulfillmentText,
             },
             sender: "Jarvis",
             id: this.messages.length,
           });
           if (this.audio)
             axios
-              .get(process.env.VUE_APP_ROOT_API + "audio_file", {
+              .get(process.env.VUE_APP_ROOT_API + `audio_file?timestamp=${new Date().getTime()}`, {
                 responseType: "blob",
               })
               .then((res) => {
                 let blob = new Blob([res.data], { type: "audio/wav" });
                 var url = URL.createObjectURL(blob);
                 var audio = new Audio();
+                audio.onload = this.revokeURL;
                 audio.src = url;
                 audio.play();
                 const promise = audio.play();
@@ -198,9 +199,9 @@ export default {
           .post(process.env.VUE_APP_ROOT_API + "message", { text: temp })
           .then((response) => {
             (message.data = {
-              fulfillmentText: response.data.queryResult.fulfillmentText,
+              fulfillmentText: response.data.fulfillmentText,
             }),
-              (this.messages[1].data = response.data.queryResult);
+              (this.messages[1].data = response.data);
           });
       }
     },
