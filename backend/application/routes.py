@@ -19,7 +19,7 @@ ref = db.reference('/Devices')
 
 devices = {"tv_bedroom":Tv('192.168.0.133', 'bedroom')}
 
-@scheduler.task('interval', id='check_devices', seconds=60)
+@scheduler.task('interval', id='check_devices', seconds=6)
 def check_devices():
     ref.set({'tv_bedroom':devices['tv_bedroom'].awaked,'computer':False})
 

@@ -1,6 +1,7 @@
 from pywebostv.discovery import *
 from pywebostv.connection import *
 from pywebostv.controls import *
+from .timeout import timeout
 
 class Tv:
 
@@ -33,6 +34,7 @@ class Tv:
         return TvControl(self.client)
 
     @property
+    @timeout(3)
     def client(self):
         client = WebOSClient(self.ip)
         client.connect()
