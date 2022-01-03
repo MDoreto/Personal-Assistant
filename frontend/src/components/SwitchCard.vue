@@ -18,7 +18,6 @@ export default {
   props: {
     icon: { required: true },
     value: { required: true },
-    name: { required: true },
     color: { default: "" },
   },
 };

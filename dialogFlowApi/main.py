@@ -1,9 +1,7 @@
-import time
 import os
 from google.cloud import dialogflow_v2beta1 as dialogflow
 from flask import Flask, request, send_file
 from flask_cors import CORS
-import subprocess
 app = Flask(__name__)
 CORS(app)
 
@@ -18,7 +16,7 @@ def detect_intent_texts(project_id, session_id, text):
         query_input = dialogflow.QueryInput(text=text_input)
         response = session_client.detect_intent(
             session=session, query_input=query_input)
-        return response
+        return response.query_result
 
 
 def detect_intent_audio(project_id='jarvis-sqri', session_id='unique'):
@@ -64,6 +62,8 @@ def send_message():
 
 @app.route('/audio', methods=['POST'])
 def send_audio():
+    if os.path.exists("output.wav"):
+        os.remove("output.wav")
     file = request.files['audio']
     file.save("message.webm")
     os.system('ffmpeg -i message.webm -c copy correct.webm')
@@ -71,9 +71,10 @@ def send_audio():
     res = detect_intent_audio()
     os.remove('correct.webm')
     os.remove('audio.wav')
+    os.remove("message.webm")
     with open("output.wav", "wb") as out:
         out.write(res.output_audio)
-    return res.__class__.to_json(res)
+    return res.query_result.__class__.to_json(res.query_result)
 
 
 @app.route('/audio_file')
