@@ -13,4 +13,4 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=jarvis-sqri-db7648fb066e.json
 
 COPY . .
 
-CMD ["gunicorn", "-b","0.0.0.0:5000", "-w 3","application:app"]
+CMD ["gunicorn", "-b","0.0.0.0:5000", "-w 1","application:app"]

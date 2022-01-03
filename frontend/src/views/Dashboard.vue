@@ -1,5 +1,5 @@
 <template>
-  <div class="pa-10 maindiv" v-if="nodeMcu">
+  <div class="pa-10 maindiv" v-if="nodeMcu && devices">
     <v-row justify="center">{{
       this.measures
         ? new Date(lastMeasure.timestamp).toLocaleString("pt-BR")
@@ -30,9 +30,9 @@
       ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
         ><PressureCard :value.sync="lastMeasure.pressure" /></v-col
       ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
-        ><SwitchCard :value="true" icon="mdi-television" color="red lighten-2"/></v-col
+        ><SwitchCard :value.sync="devices.tv_bedroom" icon="mdi-television" color="red lighten-2"/></v-col
       ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
-        ><SwitchCard :value="true" icon="mdi-desktop-classic" color="brown lighten-3"/></v-col
+        ><SwitchCard :value="false" icon="mdi-desktop-classic" color="brown lighten-3"/></v-col
       ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
         ><SwitchCard :value="true" icon="mdi-lightbulb-on-outline" color="yellow lighten-3"/></v-col
     ></v-row>
@@ -74,6 +74,7 @@ export default {
   data: () => ({
     nodeMcu: null,
     chat: false,
+    devices:null,
   }),
   components: {
     PressureChart: () => import("@/components/PressureChart.vue"),
@@ -89,6 +90,7 @@ export default {
   },
   firebase: {
     nodeMcu: db.ref("NodeMcu"),
+    devices: db.ref("Devices"),
   },
   computed: {
     measures() {
