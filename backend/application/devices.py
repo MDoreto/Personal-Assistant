@@ -43,7 +43,13 @@ class Tv:
             elif status == WebOSClient.REGISTERED:
                 print("Registration successful!")
         return client
-
+    @property
+    def awaked(self):
+        try:
+            self.client
+            return True
+        except:
+            return False
     def turn_off(self):
         self.system.power_off()
 

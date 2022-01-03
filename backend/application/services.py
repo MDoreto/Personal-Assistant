@@ -14,7 +14,7 @@ class Services:
         }
         url = 'https://www.google.com/search?q=' + query
         req = requests.get(url, headers=header, verify=False)
-        soup = BeautifulSoup(req.text, 'parser.html')
+        soup = BeautifulSoup(req.text,'html.parser')
         a = soup.select_one('.Z0LcW')
         if a:
             return a.text
