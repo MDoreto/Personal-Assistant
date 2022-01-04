@@ -6,22 +6,43 @@ from flask_apscheduler import APScheduler
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+from flask_mqtt import Mqtt
+
+devices = {"tv_bedroom":Tv('192.168.0.133', 'bedroom')}
+
+mqtt = Mqtt()
+mqtt.init_app(app)
+
+@mqtt.on_connect()
+def handle_connect(client, userdata, flags, rc):
+    mqtt.subscribe('NodeMcu')
+
+@mqtt.on_message()
+def handle_mqtt_message(client, userdata, message):
+    data = dict(
+        topic=message.topic,
+        payload=message.payload.decode()
+    )
+    print(data)
+
+def send_mqtt(topic, text):
+    mqtt.publish(topic, text)
 
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
+
+@scheduler.task('interval', id='check_devices', seconds=15)
+def check_devices():
+    ref.set({'tv_bedroom':devices['tv_bedroom'].awaked,'computer':False})
+
+
 cred = credentials.Certificate('jarvis-sqri-db7648fb066e.json')
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://jarvis-sqri-default-rtdb.firebaseio.com'
 })
 ref = db.reference('/Devices')
 
-
-devices = {"tv_bedroom":Tv('192.168.0.133', 'bedroom')}
-
-@scheduler.task('interval', id='check_devices', seconds=6)
-def check_devices():
-    ref.set({'tv_bedroom':devices['tv_bedroom'].awaked,'computer':False})
 
 
 @app.route('/webhook', methods=['POST'])
@@ -41,6 +62,7 @@ def webhook():
     return {'fulfillmentText': res} 
 @app.route('/')
 def test():
+    send_mqtt('NodeMcu', 'TESTE')
     return 'TESTE'
 
 

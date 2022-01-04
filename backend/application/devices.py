@@ -34,7 +34,7 @@ class Tv:
         return TvControl(self.client)
 
     @property
-    @timeout(3)
+    @timeout(2)
     def client(self):
         client = WebOSClient(self.ip)
         client.connect()
