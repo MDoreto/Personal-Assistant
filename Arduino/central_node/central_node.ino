@@ -5,6 +5,7 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include "PubSubClient.h"
 
 // Provide the token generation process info.
 #include "addons/TokenHelper.h"
@@ -13,6 +14,13 @@
 
 #define WIFI_SSID "DORETOALENCAR"
 #define WIFI_PASSWORD "123MDAfamilia"
+
+const char* mqtt_server = "192.168.0.173";  // IP of the MQTT broker
+int mqtt_port = 1883;  // PORTA of the MQTT broker
+const char* clientID = "nodemcu"; // MQTT client ID
+const char* command_topic = "NodeMcu";
+WiFiClient espClient;                                                   
+PubSubClient client_mqtt(espClient);
 
 // Insert Firebase project API Key
 #define API_KEY "AIzaSyBvy9KIICtW5qR374kCZ8d9TK4Twa8fq-o"
@@ -56,6 +64,38 @@ void initBME(){
   }
 }
 
+
+
+void callback(char *topic, byte *payload, unsigned int length) {
+    Serial.print("Message arrived in topic: ");
+    Serial.println(topic);
+    Serial.print("Message:");
+    String message;
+    for (int i = 0; i < length; i++) {
+        message = message + (char) payload[i];  // convert *byte to string
+    }
+    Serial.print(message);
+    Serial.println();
+    Serial.println("-----------------------");
+}
+void initMQTT(){  
+  client_mqtt.setServer(mqtt_port, 1883);                                  
+  client_mqtt.setCallback(callback);
+   while (!client_mqtt.connected()) {
+        String client_id = "esp8266-client-";
+        client_id += String(WiFi.macAddress());
+        Serial.println("Connecting to public emqx mqtt broker.....");
+        if (client_mqtt.connect(client_id)) {
+            Serial.println("Public emqx mqtt broker connected");
+        } else {
+            Serial.print("failed with state ");
+            Serial.print(client_mqtt.state());
+            delay(2000);
+        }      }
+  client_mqtt.subscribe(command_topic); 
+  client_mqtt.publish(command_topic, "hello emqx");
+  
+}
 // Initialize WiFi
 void initWiFi() {
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -112,6 +152,7 @@ void setup(){
   // Initialize BME280 sensor
   initBME();
   initWiFi();
+  initMQTT();
 
   // Assign the api key (required)
   config.api_key = API_KEY;
@@ -170,4 +211,5 @@ void loop(){
     rssi = WiFi.RSSI();
     sendStaticFloat("rssi/",rssi);
   }
+  client_mqtt.loop();
 }

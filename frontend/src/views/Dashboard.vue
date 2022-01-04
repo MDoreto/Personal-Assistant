@@ -9,32 +9,48 @@
       ><v-col
         cols="12"
         xl="5"
-        lg="5"
+        lg="8"
         md="5"
         sm="12"
         xs="12"
         class="grey lighten-4 ma-1"
         ><HistoryChart :items.sync="measures" /></v-col
-      ><v-col cols="12" lg="auto" xs="12" sm="12" class="grey lighten-4 ma-1">
+      ><v-col
+        cols="12"
+        xl="auto"
+        lg="3"
+        md="12"
+        xs="12"
+        sm="12"
+        class="grey lighten-4 ma-1"
+      >
         <TemperatureChart :value.sync="lastMeasure.temperature" /></v-col
-      ><v-col cols="12" lg="1" xs="1" sm="1" class="grey lighten-4 ma-1">
+      ><v-col cols="5" lg="1" xs="1" sm="1" class="grey lighten-4 ma-1">
         <SignalChart :value.sync="nodeMcu.rssi" /></v-col
-      ><v-col cols="12" lg="1" xs="1" sm="1" class="grey lighten-4 ma-1">
+      ><v-col cols="5" lg="1" xs="1" sm="1" class="grey lighten-4 ma-1">
         <LightChart :value.sync="nodeMcu.light" /></v-col
       ><v-col cols="12" lg="auto" xs="12" sm="12" class="grey lighten-4 ma-1">
-        <HumidityChart :value.sync="lastMeasure.humidity" /></v-col
-    ></v-row>
-    <v-row
-      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+        <HumidityChart :value.sync="lastMeasure.humidity"
+      /></v-col>
+      <v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
         ><AltitudeCard :value.sync="nodeMcu.altitude" /></v-col
-      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+      ><v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
         ><PressureCard :value.sync="lastMeasure.pressure" /></v-col
       ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
-        ><SwitchCard :value.sync="devices.tv_bedroom" icon="mdi-television" color="red lighten-2"/></v-col
+        ><SwitchCard
+          :value.sync="devices.tv_bedroom"
+          icon="mdi-television"
+          color="red lighten-2" /></v-col
       ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
-        ><SwitchCard :value="false" icon="mdi-desktop-classic" color="brown lighten-3"/></v-col
+        ><SwitchCard
+          :value="false"
+          icon="mdi-desktop-classic"
+          color="brown lighten-3" /></v-col
       ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
-        ><SwitchCard :value="true" icon="mdi-lightbulb-on-outline" color="yellow lighten-3"/></v-col
+        ><SwitchCard
+          :value="true"
+          icon="mdi-lightbulb-on-outline"
+          color="yellow lighten-3" /></v-col
     ></v-row>
 
     <v-btn
@@ -74,7 +90,7 @@ export default {
   data: () => ({
     nodeMcu: null,
     chat: false,
-    devices:null,
+    devices: null,
   }),
   components: {
     PressureChart: () => import("@/components/PressureChart.vue"),

@@ -1,8 +1,5 @@
 <template>
-  <div
-    id="signal"
-    :style="{ height: height, width: width }"
-  ></div>
+  <div id="signal" :style="{ height: height, width: width }"></div>
 </template>
 
 <script>
@@ -37,6 +34,8 @@ export default {
       ],
       title: {
         left: "center",
+        right: 10,
+        right: "auto",
         top: 15,
         text: "Signal",
         textStyle: {
