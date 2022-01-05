@@ -2,12 +2,24 @@ from pywebostv.discovery import *
 from pywebostv.connection import *
 from pywebostv.controls import *
 from .timeout import timeout
+import os
 
-class Tv:
 
-    def __init__(self, ip, location):
+def check_awaked(ip):
+    response = os.system("ping -c 1 -w 1 " + ip)
+    if response == 0:
+        return True
+    else:
+        return False
+
+class Device:
+    def __init__(self, ip):
         self.ip = ip
-        self.location = location
+    @property
+    def awaked(self):
+        return check_awaked(self.ip)
+
+class Tv(Device):
 
     @property
     def system(self):
@@ -34,7 +46,6 @@ class Tv:
         return TvControl(self.client)
 
     @property
-    @timeout(2)
     def client(self):
         client = WebOSClient(self.ip)
         client.connect()
@@ -45,13 +56,6 @@ class Tv:
             elif status == WebOSClient.REGISTERED:
                 print("Registration successful!")
         return client
-    @property
-    def awaked(self):
-        try:
-            self.client
-            return True
-        except:
-            return False
     def turn_off(self):
         self.system.power_off()
 
@@ -65,3 +69,10 @@ class Tv:
             outputs = self.media.list_audio_output_sources()
             self.media.set_audio_output(
                 next((x for x in outputs if x.data == 'bt_soundbar'), None))
+
+class Desktop(Device):
+    def turn_off():
+        print("a")
+    def turn_on():
+        print("a")
+

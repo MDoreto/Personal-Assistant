@@ -8,7 +8,9 @@ from firebase_admin import credentials
 from firebase_admin import db
 from flask_mqtt import Mqtt
 
-devices = {"tv_bedroom":Tv('192.168.0.133', 'bedroom')}
+devices = {"tv_bedroom":Tv('192.168.0.133'),
+            "desktop_bedroom":Desktop('192.168.0.30'),
+            "nodemcu_bedroom":Desktop('192.168.0.217')}
 
 mqtt = Mqtt()
 mqtt.init_app(app)
@@ -16,6 +18,7 @@ mqtt.init_app(app)
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
     mqtt.subscribe('NodeMcu')
+    mqtt.subscribe('Desktop/Status')
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
@@ -32,9 +35,13 @@ scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
-@scheduler.task('interval', id='check_devices', seconds=15)
+@scheduler.task('interval', id='check_devices', seconds=5)
 def check_devices():
-    ref.set({'tv_bedroom':devices['tv_bedroom'].awaked,'computer':False})
+    data ={}
+    for att  in devices:
+        if hasattr(devices[att],'awaked'):
+            data[att] = devices[att].awaked
+    ref.set(data)
 
 
 cred = credentials.Certificate('jarvis-sqri-db7648fb066e.json')
@@ -63,6 +70,6 @@ def webhook():
 @app.route('/')
 def test():
     send_mqtt('NodeMcu', 'TESTE')
-    return 'TESTE'
+    return str(devices['desktop_bedroom'].awaked)
 
 
