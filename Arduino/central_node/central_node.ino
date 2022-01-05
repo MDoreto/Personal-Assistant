@@ -79,13 +79,13 @@ void callback(char *topic, byte *payload, unsigned int length) {
     Serial.println("-----------------------");
 }
 void initMQTT(){  
-  client_mqtt.setServer(mqtt_port, 1883);                                  
+  client_mqtt.setServer(mqtt_server, mqtt_port);                                  
   client_mqtt.setCallback(callback);
    while (!client_mqtt.connected()) {
         String client_id = "esp8266-client-";
         client_id += String(WiFi.macAddress());
         Serial.println("Connecting to public emqx mqtt broker.....");
-        if (client_mqtt.connect(client_id)) {
+        if (client_mqtt.connect(clientID)) {
             Serial.println("Public emqx mqtt broker connected");
         } else {
             Serial.print("failed with state ");
@@ -212,4 +212,143 @@ void loop(){
     sendStaticFloat("rssi/",rssi);
   }
   client_mqtt.loop();
+}
+void enterSequence()
+{
+  for (int i = 0; i < txt.indexOf("/"); i++)
+  {
+    selectMethod(txt[i]);
+  }
+}
+void sendSignal(char s)
+{
+  digitalWrite(LED_BUILTIN, LOW);
+
+  switch (s) {
+    case 'c':
+      emissorIR.sendNEC(0x8E7807F, 32);
+      Serial.println("Power Caixa de Som");
+      delay(tempoTecla);
+      break;
+
+    case 'b':
+      emissorIR.sendNEC(0x8E750AF, 32);
+      Serial.println("bluetooth caixa de som");
+      delay(tempoTecla);
+      break;
+    case 'l':
+      emissorIR.sendNEC(0x8E7A857, 32);
+      Serial.println("linha caixa de som");
+      delay(tempoTecla);
+      break;
+    case '+':
+      emissorIR.sendNEC(0x8E7906F, 32);
+      Serial.println("volume + caixa de som");
+      delay(tempoTecla);
+      break;
+
+    case '-':
+      emissorIR.sendNEC(0x8E730CF, 32);
+      Serial.println("volume- caixa de som");
+      delay(tempoTecla);
+      break;
+
+    case 't':
+      emissorIR.sendNEC(0x20DF10EF, 32);
+      Serial.println("Power TV");
+      delay(tempoTecla);
+      break;
+
+    case 'n':
+      emissorIR.sendNEC(0xE17A48B7, 32);
+      Serial.println("power net");
+      delay(tempoTecla);
+      break;
+
+    case '1':
+      emissorIR.sendNEC(0xE17A807F, 32);
+      Serial.println("1");
+      delay(tempoTecla);
+      break;
+    case '2':
+      emissorIR.sendNEC(0xE17A40BF, 32);
+      Serial.println("2");
+      delay(tempoTecla);
+      break;
+
+    case '3':
+      emissorIR.sendNEC(0xE17AC03F, 32);
+      Serial.println("3");
+      delay(tempoTecla);
+      break;
+
+    case '4':
+      emissorIR.sendNEC(0xE17A20DF, 32);
+      Serial.println("4");
+      delay(tempoTecla);
+      break;
+    case '5':
+      emissorIR.sendNEC(0xE17AA05F, 32);
+      Serial.println("5");
+      delay(tempoTecla);
+      break;
+    case '6':
+      emissorIR.sendNEC(0xE17A609F, 32);
+      Serial.println("6");
+      delay(tempoTecla);
+      break;
+    case '7':
+      emissorIR.sendNEC(0xE17AE01F, 32);
+      Serial.println("7");
+      delay(tempoTecla);
+      break;
+    case '8':
+      emissorIR.sendNEC(0xE17A10EF, 32);
+      Serial.println("8");
+      delay(tempoTecla);
+      break;
+    case '9':
+      emissorIR.sendNEC(0xE17A906F, 32);
+      Serial.println("9");
+      delay(tempoTecla);
+      break;
+    case '0':
+      emissorIR.sendNEC(0xE17A00FF, 32);
+      Serial.println("0");
+      delay(tempoTecla);
+      break;
+    case '>':
+      emissorIR.sendNEC(0xE17AB04F, 32);
+      Serial.println("+ volume net");
+      delay(tempoTecla);
+      break;
+    case '<':
+      emissorIR.sendNEC(0xE17A708F, 32);
+      Serial.println("- volume net");
+      delay(tempoTecla);
+      break;
+    case 's':
+      emissorIR.sendNEC(0x20DF1EE1, 32);
+      Serial.println("SearchTv");
+      delay(tempoTecla);
+      break;
+    case 'a':
+      switchLight();
+      Serial.println("switch luz");
+      delay(tempoTecla);
+      break;
+    case 'p':
+      emissorIR.sendNEC(0xE17A7887, 32);
+      Serial.println("Programação NET");
+      delay(tempoTecla);
+      break;
+    case 'v':
+      emissorIR.sendNEC(0xE17A8877, 32);
+      Serial.println("Voltar NET");
+      delay(tempoTecla);
+      break;
+    case 'e':
+      enterSequence();
+  }
+  digitalWrite(LED_BUILTIN, HIGH);
 }
