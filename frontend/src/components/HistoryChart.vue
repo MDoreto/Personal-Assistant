@@ -55,7 +55,7 @@ export default {
           min: 0,
           max: 50,
           axisLabel: {
-           formatter: '{value} °C'
+            formatter: "{value} °C",
           },
         },
         {
@@ -64,9 +64,18 @@ export default {
           min: 0,
           max: 100,
           axisLabel: {
-           formatter: '{value} %',
-           align: 'right',
-           margin: 50
+            formatter: "{value} %",
+            align: "right",
+            margin: 50,
+          },
+        },
+        {
+          type: "value",
+          boundaryGap: [0, "100%"],
+          min: 900,
+          max: 950,
+          axisLabel: {
+            show: false,
           },
         },
       ],
@@ -97,6 +106,7 @@ export default {
       );
       let t = this.items.map((o) => o.temperature);
       let h = this.items.map((o) => o.humidity.toFixed(2));
+      let p = this.items.map((o) => o.pressure);
       var option = {
         xAxis: {
           type: "category",
@@ -131,8 +141,6 @@ export default {
           {
             name: "Humidity",
             yAxisIndex: 1,
-            min: 0,
-            max: 100,
             type: "line",
             symbol: "none",
             sampling: "lttb",
@@ -152,6 +160,29 @@ export default {
               ]),
             },
             data: h,
+          },
+          {
+            name: "Pressure",
+            yAxisIndex: 2,
+            type: "line",
+            symbol: "none",
+            sampling: "lttb",
+            itemStyle: {
+              color: "rgba(58,255,50)",
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                {
+                  offset: 0,
+                  color: "rgba(58,255,50,0.8)",
+                },
+                {
+                  offset: 1,
+                  color: "rgba(58,255,50,0.3)",
+                },
+              ]),
+            },
+            data: p,
           },
         ],
       };

@@ -2,7 +2,7 @@
   <div
     id="pressure"
     :style="{ height: height, width: width }"
-    class="grey lighten-4 pa-1"
+    
   ></div>
 </template>
 
@@ -17,11 +17,11 @@ export default {
     value: { required: true },
     width: {
       type: String,
-      default: "350px",
+      default: "300px",
     },
     height: {
       type: String,
-      default: "350px",
+      default: "300px",
     },
   },
   watch: {
@@ -44,15 +44,15 @@ export default {
             progress: {
               show: true,
             },
-            min: 0,
-            max: 2000,
+            min: 900,
+            max: 950,
             axisLabel: {
               fontSize: 9,
             },
             detail: {
               valueAnimation: true,
-              formatter: "{value}",
-              fontSize: 20,
+              formatter: "{value} hPA",
+              fontSize: 15,
             },
             data: [
               {

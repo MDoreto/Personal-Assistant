@@ -1,16 +1,24 @@
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
 #include <Firebase_ESP_Client.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include "PubSubClient.h"
-
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
 // Provide the token generation process info.
 #include "addons/TokenHelper.h"
 // Provide the RTDB payload printing info and other helper functions.
 #include "addons/RTDBHelper.h"
+
+const uint16_t kIrLed = 0; 
+IRsend emissorIR(kIrLed);
+#define tempoTecla 350
 
 #define WIFI_SSID "DORETOALENCAR"
 #define WIFI_PASSWORD "123MDAfamilia"
@@ -71,10 +79,13 @@ void callback(char *topic, byte *payload, unsigned int length) {
     Serial.println(topic);
     Serial.print("Message:");
     String message;
+    char command = (char) payload[0];
     for (int i = 0; i < length; i++) {
         message = message + (char) payload[i];  // convert *byte to string
     }
-    Serial.print(message);
+    Serial.print(command);
+    sendSignal(command);
+    
     Serial.println();
     Serial.println("-----------------------");
 }
@@ -106,6 +117,29 @@ void initWiFi() {
   }
   Serial.println(WiFi.localIP());
   Serial.println();
+}
+void initOTA(){
+  ArduinoOTA.onStart([]() {
+    Serial.println("Inicio...");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("nFim!");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progresso: %u%%r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Erro [%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Autenticacao Falhou");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Falha no Inicio");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Falha na Conexao");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Falha na Recepcao");
+    else if (error == OTA_END_ERROR) Serial.println("Falha no Fim");
+  });
+  ArduinoOTA.begin();
+  Serial.println("Pronto");
+  Serial.print("Endereco IP: ");
+  Serial.println(WiFi.localIP());
 }
 
 // Write float values to the database
@@ -152,6 +186,7 @@ void setup(){
   // Initialize BME280 sensor
   initBME();
   initWiFi();
+  initOTA();
   initMQTT();
 
   // Assign the api key (required)
@@ -186,7 +221,7 @@ void setup(){
   uid = auth.token.uid.c_str();
   Serial.print("User UID: ");
   Serial.println(uid);
-
+  emissorIR.begin();
   // Update database path
   databasePath = "/NodeMcu";
 
@@ -212,13 +247,16 @@ void loop(){
     sendStaticFloat("rssi/",rssi);
   }
   client_mqtt.loop();
+  ArduinoOTA.handle();
 }
-void enterSequence()
-{
-  for (int i = 0; i < txt.indexOf("/"); i++)
+void switchLight() { 
+  int ldrValue = analogRead(A0);
+  emissorIR.sendNEC(0xFF02FD, 32);
+  delay(200);
+  if (abs(ldrValue - analogRead(A0)) <10)
   {
-    selectMethod(txt[i]);
-  }
+    emissorIR.sendNEC(0xFF9867, 32);
+    }
 }
 void sendSignal(char s)
 {
@@ -347,8 +385,6 @@ void sendSignal(char s)
       Serial.println("Voltar NET");
       delay(tempoTecla);
       break;
-    case 'e':
-      enterSequence();
   }
   digitalWrite(LED_BUILTIN, HIGH);
 }

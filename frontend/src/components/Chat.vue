@@ -134,7 +134,7 @@ export default {
       formData.append("audio", file);
 
       axios
-        .post(process.env.VUE_APP_ROOT_API + "audio", formData, {
+        .post(process.env.VUE_APP_ROOT_API_DIALOG + "audio", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -151,7 +151,7 @@ export default {
           });
           if (this.audio)
             axios
-              .get(process.env.VUE_APP_ROOT_API + `audio_file?timestamp=${new Date().getTime()}`, {
+              .get(process.env.VUE_APP_ROOT_API_DIALOG + `audio_file?timestamp=${new Date().getTime()}`, {
                 responseType: "blob",
               })
               .then((res) => {
@@ -196,7 +196,7 @@ export default {
         };
         this.messages.unshift(message);
         axios
-          .post(process.env.VUE_APP_ROOT_API + "message", { text: temp })
+          .post(process.env.VUE_APP_ROOT_API_DIALOG + "message", { text: temp })
           .then((response) => {
             (message.data = {
               fulfillmentText: response.data.fulfillmentText,

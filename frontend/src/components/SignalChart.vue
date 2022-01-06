@@ -13,7 +13,7 @@ export default {
     value: { required: true },
     height: {
       type: String,
-      default: "350px",
+      default: "300px",
     },
     width: {
       type: String,

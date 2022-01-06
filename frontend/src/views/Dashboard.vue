@@ -6,15 +6,28 @@
         : ""
     }}</v-row>
     <v-row justify="center" align="center" class=""
-      ><v-col
-        cols="12"
-        xl="5"
-        lg="8"
-        md="5"
-        sm="12"
-        xs="12"
-        class="grey lighten-4 ma-1"
-        ><HistoryChart :items.sync="measures" /></v-col
+      ><v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
+        ><AltitudeCard :value.sync="nodeMcu.altitude" /></v-col
+      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+        ><SwitchCard
+          :value.sync="devices.tv_bedroom"
+          icon="mdi-television"
+          color="red lighten-2" /></v-col
+      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+        ><SwitchCard
+          :value.sync="devices.desktop_bedroom"
+          icon="mdi-desktop-classic"
+          color="brown lighten-3" /></v-col
+      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+        ><SwitchCard
+          :value.sync="devices.nodemcu_bedroom"
+          icon="mdi-car-esp"
+          color="yellow lighten-3" /></v-col
+      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+        ><LightCard
+          :value="true"
+          icon="mdi-lightbulb-on-outline"
+          color="orange lighten-3" /></v-col
       ><v-col
         cols="12"
         xl="auto"
@@ -30,28 +43,19 @@
       ><v-col cols="5" lg="1" xs="1" sm="1" class="grey lighten-4 ma-1">
         <LightChart :value.sync="nodeMcu.light" /></v-col
       ><v-col cols="12" lg="auto" xs="12" sm="12" class="grey lighten-4 ma-1">
-        <HumidityChart :value.sync="lastMeasure.humidity"
+        <HumidityChart :value.sync="lastMeasure.humidity" /></v-col
+      ><v-col cols="12" lg="2" xs="12" sm="12" class="grey lighten-4 ma-1"><PressureChart :value.sync="lastMeasure.pressure" /></v-col
+      ><v-col
+        cols="12"
+        xl="12"
+        lg="12"
+        md="12"
+        sm="12"
+        xs="12"
+        class="grey lighten-4 ma-1"
+        ><HistoryChart :items.sync="measures"
       /></v-col>
-      <v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
-        ><AltitudeCard :value.sync="nodeMcu.altitude" /></v-col
-      ><v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
-        ><PressureCard :value.sync="lastMeasure.pressure" /></v-col
-      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
-        ><SwitchCard
-          :value.sync="devices.tv_bedroom"
-          icon="mdi-television"
-          color="red lighten-2" /></v-col
-      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
-        ><SwitchCard
-          :value="false"
-          icon="mdi-desktop-classic"
-          color="brown lighten-3" /></v-col
-      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
-        ><SwitchCard
-          :value="true"
-          icon="mdi-lightbulb-on-outline"
-          color="yellow lighten-3" /></v-col
-    ></v-row>
+    </v-row>
 
     <v-btn
       color="blue darken-2"
@@ -103,6 +107,7 @@ export default {
     PressureCard: () => import("@/components/PressureCard.vue"),
     Chat: () => import("@/components/Chat.vue"),
     SwitchCard: () => import("@/components/SwitchCard.vue"),
+    LightCard: () => import("@/components/LightCard.vue"),
   },
   firebase: {
     nodeMcu: db.ref("NodeMcu"),

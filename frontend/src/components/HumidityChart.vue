@@ -17,7 +17,7 @@ export default {
     value: { required: true },
     height: {
       type: String,
-      default: "350px",
+      default: "300px",
     },
     width: {
       type: String,
@@ -42,7 +42,7 @@ export default {
         },
         title: {
           left: "center",
-          top: 45,
+          top: 20,
           text: "Humidity",
           textStyle: {
             fontSize: 25,

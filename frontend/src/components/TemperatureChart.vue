@@ -17,11 +17,11 @@ export default {
     value: { required: true },
     width: {
       type: String,
-      default: "375px",
+      default: "350px",
     },
     height: {
       type: String,
-      default: "350px",
+      default: "300px",
     },
   },
   watch: {
@@ -94,7 +94,7 @@ export default {
               lineHeight: 20,
               borderRadius: 8,
               offsetCenter: [0, "-5%"],
-              fontSize: 35,
+              fontSize: 30,
               fontWeight: "bolder",
               formatter: "{value} °C",
               color: "inherit",
