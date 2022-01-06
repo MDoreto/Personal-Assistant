@@ -6,30 +6,12 @@ from flask_apscheduler import APScheduler
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
-from flask_mqtt import Mqtt
 
 devices = {"tv_bedroom":Tv('192.168.0.133'),
             "desktop_bedroom":Desktop('192.168.0.30'),
-            "nodemcu_bedroom":Desktop('192.168.0.217')}
-
-mqtt = Mqtt()
-mqtt.init_app(app)
-
-@mqtt.on_connect()
-def handle_connect(client, userdata, flags, rc):
-    mqtt.subscribe('NodeMcu')
-    mqtt.subscribe('Desktop/Status')
-
-@mqtt.on_message()
-def handle_mqtt_message(client, userdata, message):
-    data = dict(
-        topic=message.topic,
-        payload=message.payload.decode()
-    )
-    print(data)
-
-def send_mqtt(topic, text):
-    mqtt.publish(topic, text)
+            "nodemcu_bedroom":Desktop('192.168.0.217'),
+            "light_bedroom": Light(),
+            "soundbox_bedroom":SoundBox()}
 
 scheduler = APScheduler()
 scheduler.init_app(app)
@@ -64,12 +46,32 @@ def webhook():
             res = Services.consult_weather(req['queryResult']['parameters'])
         if intent =='google_search':
             res = Services.google_search(req['queryResult']['queryText'])
+        if intent == 'turn_on':
+            temp = devices[req['queryResult']['parameters']['device']]
+            if hasattr(temp, intent):
+                getattr(temp,intent)()
+            else:
+                temp.switch()
         if intent == 'turn_off':
+            temp = devices[req['queryResult']['parameters']['device']]
+            if hasattr(temp, intent):
+                getattr(temp,intent)()
+            else:
+                temp.switch()
+        if intent in ['volume_up','volume_down']:
             getattr(devices[req['queryResult']['parameters']['device']],intent)()
+            
     return {'fulfillmentText': res} 
+
+@app.route('/api', methods=['POST'])
+def api():
+    device = request.json['device']
+    action = request.json['action']
+    getattr(devices[device],action)()
+    return {'message':'command has been executed'}
 @app.route('/')
 def test():
-    send_mqtt('NodeMcu', 'TESTE')
-    return str(devices['desktop_bedroom'].awaked)
+    devices['tv_bedroom'].search('encanto')
+    return 'teste'
 
 

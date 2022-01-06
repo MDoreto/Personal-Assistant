@@ -2,11 +2,13 @@ from pywebostv.discovery import *
 from pywebostv.connection import *
 from pywebostv.controls import *
 from .timeout import timeout
+from .mqtt import send_mqtt
 import os
+from time import sleep
 
 
 def check_awaked(ip):
-    response = os.system("ping -c 1 -w 1 " + ip)
+    response = os.system("ping -c 1 -w 1 " + ip + " >/dev/null")
     if response == 0:
         return True
     else:
@@ -20,7 +22,7 @@ class Device:
         return check_awaked(self.ip)
 
 class Tv(Device):
-
+    _client = None
     @property
     def system(self):
         return SystemControl(self.client)
@@ -47,19 +49,25 @@ class Tv(Device):
 
     @property
     def client(self):
-        client = WebOSClient(self.ip)
-        client.connect()
-        store = {'client_key': 'a32d4a9287aa406c1f7a1b53c80cea3f'}
-        for status in client.register(store):
-            if status == WebOSClient.PROMPTED:
-                print("Please accept the connect on the TV!")
-            elif status == WebOSClient.REGISTERED:
-                print("Registration successful!")
-        return client
-    def turn_off(self):
-        self.system.power_off()
+        if not self._client:
+            client = WebOSClient(self.ip)
+            client.connect()
+            store = {'client_key': 'a32d4a9287aa406c1f7a1b53c80cea3f'}
+            for status in client.register(store):
+                if status == WebOSClient.PROMPTED:
+                    print("Please accept the connect on the TV!")
+                elif status == WebOSClient.REGISTERED:
+                    print("Registration successful!")
+            self._client =client
+            return client
+        return self._client
+    def switch(self):
+        send_mqtt('t')
 
     def connect_to(self, device):
+        if not self.client:
+            self.turn_on
+        sleep(3)
         device_name = device.__qualname__.split('.')[0]
         if device_name == 'Desktop':
             sources = self.source.list_sources()
@@ -70,9 +78,50 @@ class Tv(Device):
             self.media.set_audio_output(
                 next((x for x in outputs if x.data == 'bt_soundbar'), None))
 
+    def volume_down(self):
+        self.media.set_volume(self.media.get_volume()['volume'] -10)
+    def volume_up(self):
+        self.media.set_volume(self.media.get_volume()['volume'] +10)
+    def __get_app(self, title):
+        return [x for x in apps if title in x["title"].lower()][0]
+    def search(self,title):
+        if not self.client:
+            self.turn_on
+        sleep(3)
+        send_mqtt('s')
+        sleep(1)
+        self.inp.type(title)
+        inp = InputControl(self.client)
+        inp.connect_input()
+        for i in range (6):
+            inp.right()
+        inp.ok() 
+        sleep(7)
+        inp.ok()
+        sleep(15)
+        inp.ok()
+        inp.disconnect_input()
+
 class Desktop(Device):
     def turn_off():
         print("a")
     def turn_on():
         print("a")
 
+class Light:
+    def switch(self):
+        send_mqtt('a')
+
+class SoundBox:
+    def switch(self):
+        send_mqtt('c')
+    def connect_to(self, device):
+        device_name = device.__qualname__.split('.')[0]
+        if device_name == 'Desktop':
+            send_mqtt('l')
+        if device_name == 'Tv':
+            send_mqtt('b')
+    def volume_up(self):
+        send_mqtt('+')
+    def volume_down(self):
+        send_mqtt('-')
