@@ -49,6 +49,9 @@ class Tv(Device):
 
     @property
     def client(self):
+        if not self.awaked:
+            self.switch()
+            sleep(2)
         if not self._client:
             client = WebOSClient(self.ip)
             client.connect()
@@ -60,14 +63,15 @@ class Tv(Device):
                     print("Registration successful!")
             self._client =client
             return client
+
         return self._client
+    def __open_app(self,name):
+        apps = self.app.list_apps()
+        app = [x for x in apps if name in x["title"].lower()][0]
+        self.app.launch(app)
     def switch(self):
         send_mqtt('t')
-
     def connect_to(self, device):
-        if not self.client:
-            self.turn_on
-        sleep(3)
         device_name = device.__qualname__.split('.')[0]
         if device_name == 'Desktop':
             sources = self.source.list_sources()
@@ -82,25 +86,23 @@ class Tv(Device):
         self.media.set_volume(self.media.get_volume()['volume'] -10)
     def volume_up(self):
         self.media.set_volume(self.media.get_volume()['volume'] +10)
-    def __get_app(self, title):
-        return [x for x in apps if title in x["title"].lower()][0]
     def search(self,title):
-        if not self.client:
-            self.turn_on
-        sleep(3)
-        send_mqtt('s')
-        sleep(1)
-        self.inp.type(title)
-        inp = InputControl(self.client)
-        inp.connect_input()
-        for i in range (6):
-            inp.right()
-        inp.ok() 
-        sleep(7)
-        inp.ok()
-        sleep(15)
-        inp.ok()
-        inp.disconnect_input()
+        if title in ['netflix', 'disney','amazon']:
+            self.__open_app(title)
+        else:
+            inp = InputControl(self.client)
+            send_mqtt('s')
+            sleep(1)
+            self.inp.type(title)
+            inp.connect_input()
+            for i in range (6):
+                inp.right()
+            inp.ok() 
+            sleep(7)
+            inp.ok()
+            sleep(20)
+            inp.ok()
+            inp.disconnect_input()
 
 class Desktop(Device):
     def turn_off():
@@ -117,10 +119,10 @@ class SoundBox:
         send_mqtt('c')
     def connect_to(self, device):
         device_name = device.__qualname__.split('.')[0]
-        if device_name == 'Desktop':
-            send_mqtt('l')
         if device_name == 'Tv':
             send_mqtt('b')
+        else:
+            send_mqtt('l')
     def volume_up(self):
         send_mqtt('+')
     def volume_down(self):

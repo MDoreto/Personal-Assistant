@@ -67,7 +67,7 @@ def webhook():
 def api():
     device = request.json['device']
     action = request.json['action']
-    getattr(devices[device],action)()
+    getattr(devices[device],action)(request.json['title'])
     return {'message':'command has been executed'}
 @app.route('/')
 def test():
