@@ -53,7 +53,7 @@ def webhook():
         if intent in ['volume_up','volume_down','next_music','prev_music']:
             getattr(devices[parameters['device']],intent)()
         if intent=='stop_music':
-            sp.pause_playback()
+            spotify.stop_music()
         if intent=='play_music':
             return get_response(**spotify.play_music())
         if intent == 'get_music_name':

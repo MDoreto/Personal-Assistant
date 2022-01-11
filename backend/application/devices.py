@@ -109,7 +109,7 @@ class Tv(Device):
 
 class Desktop(Device):
     def __getattr__(self, attr):
-        send_mqtt(attr, 'Desktop')
+        return lambda : send_mqtt(attr, 'Desktop')
 
 class Light:
     def switch(self):
