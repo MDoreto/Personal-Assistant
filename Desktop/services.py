@@ -3,29 +3,26 @@ import sys
 import os 
 import pyautogui
 import time
-import unidecode
+
 sensi_media = 5
-def up_media():
+def volume_up():
 	for i in range (sensi_media):
 		pyautogui.press('volumeup')
-def down_media():
+def volume_down():
 	for i in range (sensi_media):
 		pyautogui.press('volumedown')
 def mute_media():
 	pyautogui.press('volumemute')
-def next_media():
+def next_music():
 	pyautogui.press('nexttrack')
-def back_media():
+def prev_music():
 	pyautogui.press('prevtrack')
-	pyautogui.press('prevtrack')
-def repeat_media():
-	pyautogui.press('prevtrack')
-def play_media():
+def play_music():
 	pyautogui.press('playpause')
 
-def windowsSearch(string):
+def search(string):
 	pyautogui.press('win')
-	pyautogui.write(unidecode.unidecode(string))
+	pyautogui.write(string)
 	pyautogui.press('enter')
 
 def conTv():
@@ -34,7 +31,7 @@ def conTv():
 def desconTv():
 	os.system('DisplaySwitch.exe /extend')
 		
-def printFile(self,string):
+def printFile(string):
 	temp =string
 	t = temp.split()
 	try:
@@ -46,7 +43,7 @@ def printFile(self,string):
 		
 	except:
 		n =1
-	windowsSearch(temp)
+	search(temp)
 	time.sleep(6)
 	for i in range(n):
 		pyautogui.press('enter')

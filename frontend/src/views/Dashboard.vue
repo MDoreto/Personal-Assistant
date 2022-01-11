@@ -1,29 +1,27 @@
 <template>
   <div class="pa-10 maindiv" v-if="nodeMcu && devices">
-    <v-row justify="center">{{
-      this.measures
-        ? new Date(lastMeasure.timestamp).toLocaleString("pt-BR")
-        : ""
-    }}</v-row>
+    <v-row justify="center"></v-row>
     <v-row justify="center" align="center" class=""
+      ><v-col cols="9" xl="auto" lg="3" md="auto" sm="12" xs="12" class="ma-1"
+        ><Clock :date="new Date(lastMeasure.timestamp)" /></v-col
       ><v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
         ><AltitudeCard :value.sync="nodeMcu.altitude" /></v-col
-      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+      ><v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
         ><SwitchCard
           :value.sync="devices.tv_bedroom"
           icon="mdi-television"
           color="red lighten-2" /></v-col
-      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+      ><v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
         ><SwitchCard
           :value.sync="devices.desktop_bedroom"
           icon="mdi-desktop-classic"
           color="brown lighten-3" /></v-col
-      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+      ><v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
         ><SwitchCard
           :value.sync="devices.nodemcu_bedroom"
           icon="mdi-car-esp"
           color="yellow lighten-3" /></v-col
-      ><v-col cols="12" xl="2" lg="2" md="2" sm="12" xs="12" class="ma-1"
+      ><v-col cols="12" xl="2" lg="3" md="2" sm="12" xs="12" class="ma-1"
         ><LightCard
           :value="true"
           icon="mdi-lightbulb-on-outline"
@@ -44,7 +42,8 @@
         <LightChart :value.sync="nodeMcu.light" /></v-col
       ><v-col cols="12" lg="auto" xs="12" sm="12" class="grey lighten-4 ma-1">
         <HumidityChart :value.sync="lastMeasure.humidity" /></v-col
-      ><v-col cols="12" lg="2" xs="12" sm="12" class="grey lighten-4 ma-1"><PressureChart :value.sync="lastMeasure.pressure" /></v-col
+      ><v-col cols="12" lg="2" xs="12" sm="12" class="grey lighten-4 ma-1"
+        ><PressureChart :value.sync="lastMeasure.pressure" /></v-col
       ><v-col
         cols="12"
         xl="12"
@@ -108,6 +107,7 @@ export default {
     Chat: () => import("@/components/Chat.vue"),
     SwitchCard: () => import("@/components/SwitchCard.vue"),
     LightCard: () => import("@/components/LightCard.vue"),
+    Clock: () => import("@/components/Clock.vue"),
   },
   firebase: {
     nodeMcu: db.ref("NodeMcu"),
