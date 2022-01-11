@@ -1,22 +1,14 @@
-import paho.mqtt.client as mqtt #import library
- 
-MQTT_SERVER = "192.168.0.173" #specify the broker address, it can be IP of raspberry pi or simply localhost
-MQTT_PATH = 'Desktop/Status' #this is the name of topic, like temp
- 
-# The callback for when the client receives a CONNACK response from the server.
+import paho.mqtt.client as mqtt 
+import services 
+MQTT_SERVER = "192.168.0.173" 
+MQTT_PATH = 'Desktop' 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
- 
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
     client.subscribe(MQTT_PATH)
-    client.publish(MQTT_PATH,True, retain=True)
- 
-# The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
-    # more callbacks, etc
- 
+    action = msg.payload.decode("utf-8")
+    print(action)
+    getattr(services, action)()
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
