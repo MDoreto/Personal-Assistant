@@ -69,6 +69,9 @@ class Tv(Device):
         apps = self.app.list_apps()
         app = [x for x in apps if name in x["title"].lower()][0]
         self.app.launch(app)
+        sleep(15)
+        self.media.play()
+        sleep(2)
     def switch(self):
         send_mqtt('t')
     def connect_to(self, device):
@@ -87,7 +90,7 @@ class Tv(Device):
     def volume_up(self):
         self.media.set_volume(self.media.get_volume()['volume'] +10)
     def search(self,title):
-        if title in ['netflix', 'disney','amazon']:
+        if title in ['netflix', 'disney','amazon','spotify']:
             self.__open_app(title)
         else:
             inp = InputControl(self.client)
@@ -105,10 +108,8 @@ class Tv(Device):
             inp.disconnect_input()
 
 class Desktop(Device):
-    def turn_off():
-        print("a")
-    def turn_on():
-        print("a")
+    def __getattr__(self, attr):
+        send_mqtt(attr, 'Desktop')
 
 class Light:
     def switch(self):
